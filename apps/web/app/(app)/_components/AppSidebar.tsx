@@ -8,14 +8,14 @@ import { createClient } from '@/lib/supabase/client'
 const navItems = {
   fr: [
     { href: '/dashboard', icon: '🏠', label: 'Tableau de bord' },
-    { href: '/characters', icon: '🎭', label: 'Personnages', soon: true },
+    { href: '/characters', icon: '🎭', label: 'Personnages' },
     { href: '/scripts', icon: '📝', label: 'Scripts', soon: true },
     { href: '/videos', icon: '🎬', label: 'Vidéos', soon: true },
     { href: '/settings', icon: '⚙️', label: 'Paramètres', soon: true },
   ],
   en: [
     { href: '/dashboard', icon: '🏠', label: 'Dashboard' },
-    { href: '/characters', icon: '🎭', label: 'Characters', soon: true },
+    { href: '/characters', icon: '🎭', label: 'Characters' },
     { href: '/scripts', icon: '📝', label: 'Scripts', soon: true },
     { href: '/videos', icon: '🎬', label: 'Videos', soon: true },
     { href: '/settings', icon: '⚙️', label: 'Settings', soon: true },

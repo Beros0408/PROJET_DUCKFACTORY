@@ -6,7 +6,9 @@ export type VideoStatus = 'pending' | 'processing' | 'completed' | 'failed'
 
 export type Platform = 'youtube' | 'tiktok' | 'instagram' | 'facebook'
 
-export type Personality = 'funny' | 'serious' | 'wise' | 'naive' | 'energetic'
+export type Personality = 'drole' | 'serieux' | 'sage' | 'naif'
+
+export type Tone = 'kid' | 'teen' | 'adult' | 'expert'
 
 export interface User {
   id: string
@@ -19,10 +21,14 @@ export interface Character {
   id: string
   user_id: string
   name: string
+  description: string | null
   personality: Personality
-  catchphrase: string
-  voice_id?: string
-  avatar_url?: string
+  tone: Tone
+  catchphrase: string | null
+  tic_verbal: string | null
+  avatar_url: string | null
+  voice_id: string | null
+  language: Locale
   created_at: string
   updated_at: string
 }
@@ -66,7 +72,6 @@ export interface Publication {
   created_at: string
 }
 
-// API Response types
 export interface ApiResponse<T> {
   data: T
   message?: string

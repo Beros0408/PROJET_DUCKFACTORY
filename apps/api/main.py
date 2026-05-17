@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from routers import characters as characters_router
 
 APP_VERSION = "0.1.0"
 APP_NAME = "DuckFactory"
@@ -27,6 +28,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(characters_router.router)
 
 
 @app.get("/")
