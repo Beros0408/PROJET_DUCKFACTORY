@@ -1,6 +1,7 @@
 {
   "name": "duckfactory",
   "private": true,
+  "packageManager": "pnpm@10.28.0",
   "scripts": {
     "dev": "turbo run dev --parallel",
     "build": "turbo run build",
