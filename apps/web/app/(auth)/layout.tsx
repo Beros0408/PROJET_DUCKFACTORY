@@ -8,7 +8,6 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-white to-sky-50 flex flex-col">
-      {/* Top bar */}
       <header className="flex justify-between items-center px-6 py-4">
         <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
           <span className="text-2xl">🦆</span>
@@ -22,7 +21,6 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </button>
       </header>
 
-      {/* Main content — passes lang via a hidden div hack-free: use context via cloneElement */}
       <main className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
           {children}

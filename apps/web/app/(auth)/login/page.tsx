@@ -79,14 +79,12 @@ export default function LoginPage() {
 
   return (
     <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-      {/* Header */}
       <div className="text-center mb-8">
         <div className="text-4xl mb-3">🦆</div>
         <h1 className="text-2xl font-bold text-gray-900">{tr.title}</h1>
         <p className="text-gray-500 mt-1">{tr.subtitle}</p>
       </div>
 
-      {/* Lang toggle */}
       <div className="flex justify-center mb-6">
         <button
           onClick={() => setLang(l => l === 'fr' ? 'en' : 'fr')}
@@ -96,7 +94,6 @@ export default function LoginPage() {
         </button>
       </div>
 
-      {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">{tr.email}</label>
@@ -144,7 +141,6 @@ export default function LoginPage() {
         </button>
       </form>
 
-      {/* Footer link */}
       <p className="text-center text-sm text-gray-500 mt-6">
         {tr.noAccount}{' '}
         <Link href="/signup" className="text-yellow-600 hover:text-yellow-700 font-semibold">

@@ -81,9 +81,7 @@ export default function SignupPage() {
     const { error: authError } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
     })
     setLoading(false)
 
@@ -104,10 +102,7 @@ export default function SignupPage() {
         <p className="text-gray-600 mb-1">{tr.successMsg}</p>
         <p className="text-yellow-600 font-semibold mb-4">{email}</p>
         <p className="text-gray-500 text-sm">{tr.successSub}</p>
-        <Link
-          href="/login"
-          className="inline-block mt-6 text-yellow-600 hover:text-yellow-700 font-semibold text-sm"
-        >
+        <Link href="/login" className="inline-block mt-6 text-yellow-600 hover:text-yellow-700 font-semibold text-sm">
           ← {tr.login}
         </Link>
       </div>
@@ -116,14 +111,12 @@ export default function SignupPage() {
 
   return (
     <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-      {/* Header */}
       <div className="text-center mb-8">
         <div className="text-4xl mb-3">🦆</div>
         <h1 className="text-2xl font-bold text-gray-900">{tr.title}</h1>
         <p className="text-gray-500 mt-1">{tr.subtitle}</p>
       </div>
 
-      {/* Lang toggle */}
       <div className="flex justify-center mb-6">
         <button
           onClick={() => setLang(l => l === 'fr' ? 'en' : 'fr')}
@@ -133,7 +126,6 @@ export default function SignupPage() {
         </button>
       </div>
 
-      {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">{tr.email}</label>
