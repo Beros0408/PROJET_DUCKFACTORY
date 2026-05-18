@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { fetchCharacter, updateCharacter, type Character } from '@/lib/api/characters'
+import BackButton from '@/components/common/BackButton'
 import CharacterAvatar from '@/components/characters/CharacterAvatar'
 
 const PERSONALITY_LABELS: Record<string, { fr: string; en: string; emoji: string }> = {
@@ -22,7 +22,7 @@ const TONE_LABELS: Record<string, { fr: string; en: string; emoji: string }> = {
 
 const t = {
   fr: {
-    back: '← Mes personnages',
+    backLabel: 'Mes personnages',
     edit: 'Modifier',
     cancel: 'Annuler',
     save: 'Enregistrer',
@@ -39,7 +39,7 @@ const t = {
     saveError: 'Erreur lors de l\'enregistrement.',
   },
   en: {
-    back: '← My characters',
+    backLabel: 'My characters',
     edit: 'Edit',
     cancel: 'Cancel',
     save: 'Save',
@@ -108,8 +108,8 @@ export default function CharacterDetailPage() {
   if (loading) return <div className="p-8 text-gray-400">{tr.loading}</div>
   if (!character || error) return (
     <div className="p-8">
-      <p className="text-red-500 mb-4">{error || tr.notFound}</p>
-      <Link href="/characters" className="text-yellow-600 hover:text-yellow-700 font-semibold">{tr.back}</Link>
+      <BackButton href="/characters" label={tr.backLabel} />
+      <p className="text-red-500">{error || tr.notFound}</p>
     </div>
   )
 
@@ -121,10 +121,8 @@ export default function CharacterDetailPage() {
 
   return (
     <div className="p-8 max-w-2xl">
-      <div className="mb-6 flex items-center justify-between">
-        <Link href="/characters" className="text-sm text-gray-400 hover:text-gray-600 transition-colors">
-          {tr.back}
-        </Link>
+      <div className="mb-2 flex items-center justify-between">
+        <BackButton href="/characters" label={tr.backLabel} />
         {!editing ? (
           <button
             onClick={() => setEditing(true)}

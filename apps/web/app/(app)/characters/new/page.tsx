@@ -1,8 +1,8 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import CharacterForm from '@/components/characters/CharacterForm'
+import BackButton from '@/components/common/BackButton'
 
 export default function NewCharacterPage() {
   const router = useRouter()
@@ -14,11 +14,7 @@ export default function NewCharacterPage() {
 
   return (
     <div className="p-8">
-      <div className="mb-6">
-        <Link href="/characters" className="text-sm text-gray-400 hover:text-gray-600 transition-colors">
-          ← Mes personnages
-        </Link>
-      </div>
+      <BackButton href="/characters" label="Mes personnages" />
       <CharacterForm onSuccess={handleSuccess} />
     </div>
   )

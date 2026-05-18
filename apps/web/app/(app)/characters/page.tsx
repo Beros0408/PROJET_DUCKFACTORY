@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { fetchCharacters, deleteCharacter, type Character } from '@/lib/api/characters'
 import CharacterCard from '@/components/characters/CharacterCard'
+import BackButton from '@/components/common/BackButton'
 
 const t = {
   fr: {
@@ -53,6 +54,7 @@ export default function CharactersPage() {
 
   return (
     <div className="p-8 max-w-5xl">
+      <BackButton href="/dashboard" label={lang === 'fr' ? 'Tableau de bord' : 'Dashboard'} />
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">{tr.title} 🎭</h1>
