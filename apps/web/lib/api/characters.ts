@@ -1,7 +1,3 @@
-import { createClient } from '@/lib/supabase/client'
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
-
 export interface Character {
   id: string
   user_id: string
@@ -28,20 +24,11 @@ export interface CreateCharacterInput {
   language: 'fr' | 'en'
 }
 
-async function getToken(): Promise<string> {
-  const supabase = createClient()
-  const { data: { session } } = await supabase.auth.getSession()
-  if (!session) throw new Error('Not authenticated')
-  return session.access_token
-}
-
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const token = await getToken()
-  const res = await fetch(`${API_URL}${path}`, {
+  const res = await fetch(path, {
     ...init,
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
       ...init?.headers,
     },
   })
@@ -54,16 +41,16 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const fetchCharacters = (): Promise<Character[]> =>
-  apiFetch('/api/v1/characters')
+  apiFetch('/api/characters')
 
 export const fetchCharacter = (id: string): Promise<Character> =>
-  apiFetch(`/api/v1/characters/${id}`)
+  apiFetch(`/api/characters/${id}`)
 
 export const createCharacter = (data: CreateCharacterInput): Promise<Character> =>
-  apiFetch('/api/v1/characters', { method: 'POST', body: JSON.stringify(data) })
+  apiFetch('/api/characters', { method: 'POST', body: JSON.stringify(data) })
 
 export const updateCharacter = (id: string, data: Partial<CreateCharacterInput>): Promise<Character> =>
-  apiFetch(`/api/v1/characters/${id}`, { method: 'PATCH', body: JSON.stringify(data) })
+  apiFetch(`/api/characters/${id}`, { method: 'PATCH', body: JSON.stringify(data) })
 
 export const deleteCharacter = (id: string): Promise<void> =>
-  apiFetch(`/api/v1/characters/${id}`, { method: 'DELETE' })
+  apiFetch(`/api/characters/${id}`, { method: 'DELETE' })
