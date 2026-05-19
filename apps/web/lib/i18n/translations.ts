@@ -46,7 +46,15 @@ export const translations = {
 
     // Scripts
     'scripts.title': 'Mes Scripts',
-    'scripts.generate': 'Générer 5 scripts',
+    'scripts.new': 'Nouveau script',
+    'scripts.generate': 'Générer le script',
+    'scripts.generating': 'Génération en cours...',
+    'scripts.topic': 'Sujet du script',
+    'scripts.format': 'Format',
+    'scripts.tone': 'Ton',
+    'scripts.audience': 'Audience',
+    'scripts.duration': 'Durée cible',
+    'scripts.result': 'Script généré',
     'scripts.hook': 'Accroche',
     'scripts.body': 'Corps',
     'scripts.punchline': 'Punchline',
@@ -54,6 +62,9 @@ export const translations = {
     'scripts.delete': 'Supprimer',
     'scripts.generateVoice': 'Générer la voix',
     'scripts.empty': 'Aucun script. Générez des scripts pour votre personnage !',
+    'scripts.status.draft': 'Brouillon',
+    'scripts.status.ready': 'Prêt',
+    'scripts.status.used': 'Utilisé',
 
     // Videos
     'videos.title': 'Mes Vidéos',
@@ -143,7 +154,15 @@ export const translations = {
 
     // Scripts
     'scripts.title': 'My Scripts',
-    'scripts.generate': 'Generate 5 scripts',
+    'scripts.new': 'New script',
+    'scripts.generate': 'Generate script',
+    'scripts.generating': 'Generating...',
+    'scripts.topic': 'Script topic',
+    'scripts.format': 'Format',
+    'scripts.tone': 'Tone',
+    'scripts.audience': 'Audience',
+    'scripts.duration': 'Target duration',
+    'scripts.result': 'Generated script',
     'scripts.hook': 'Hook',
     'scripts.body': 'Body',
     'scripts.punchline': 'Punchline',
@@ -151,6 +170,9 @@ export const translations = {
     'scripts.delete': 'Delete',
     'scripts.generateVoice': 'Generate voice',
     'scripts.empty': 'No scripts yet. Generate scripts for your character!',
+    'scripts.status.draft': 'Draft',
+    'scripts.status.ready': 'Ready',
+    'scripts.status.used': 'Used',
 
     // Videos
     'videos.title': 'My Videos',

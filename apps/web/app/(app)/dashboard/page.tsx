@@ -7,7 +7,7 @@ const content = {
     subtitle: 'Votre studio IA est prêt. Créez votre premier personnage !',
     cards: [
       { icon: '🎭', title: 'Créer un personnage', desc: 'Donnez vie à votre avatar IA', href: '/characters', cta: 'Créer' },
-      { icon: '📝', title: 'Générer des scripts', desc: 'GPT-4o rédige vos scripts viraux', href: '/scripts', cta: 'Générer', soon: true },
+      { icon: '📝', title: 'Générer des scripts', desc: 'GPT-4o rédige vos scripts viraux', href: '/scripts', cta: 'Générer' },
       { icon: '🎬', title: 'Mes vidéos', desc: 'Gérez votre production vidéo', href: '/videos', cta: 'Voir', soon: true },
       { icon: '⚙️', title: 'Paramètres', desc: 'Gérez votre compte et intégrations', href: '/settings', cta: 'Configurer', soon: true },
     ],
@@ -18,14 +18,14 @@ const content = {
       { label: 'Publications', value: '0' },
     ],
     soon: 'Bientôt disponible',
-    beta: '🎭 IT-003 — Module personnages actif ! Crée ton premier avatar IA.',
+    beta: '📝 IT-004 — Module scripts actif ! Génère ton premier script viral avec GPT-4o.',
   },
   en: {
     welcome: 'Welcome to DuckFactory',
     subtitle: 'Your AI studio is ready. Create your first character!',
     cards: [
       { icon: '🎭', title: 'Create a character', desc: 'Bring your AI avatar to life', href: '/characters', cta: 'Create' },
-      { icon: '📝', title: 'Generate scripts', desc: 'GPT-4o writes your viral scripts', href: '/scripts', cta: 'Generate', soon: true },
+      { icon: '📝', title: 'Generate scripts', desc: 'GPT-4o writes your viral scripts', href: '/scripts', cta: 'Generate' },
       { icon: '🎬', title: 'My videos', desc: 'Manage your video production', href: '/videos', cta: 'View', soon: true },
       { icon: '⚙️', title: 'Settings', desc: 'Manage your account and integrations', href: '/settings', cta: 'Configure', soon: true },
     ],
@@ -36,7 +36,7 @@ const content = {
       { label: 'Publications', value: '0' },
     ],
     soon: 'Coming soon',
-    beta: '🎭 IT-003 — Characters module live! Create your first AI avatar.',
+    beta: '📝 IT-004 — Scripts module live! Generate your first viral script with GPT-4o.',
   },
 }
 
