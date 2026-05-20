@@ -66,6 +66,13 @@ export const translations = {
     'scripts.status.ready': 'Prêt',
     'scripts.status.used': 'Utilisé',
 
+    // Voice
+    'voice.generate':      '🎤 Générer la voix',
+    'voice.generating':    'Génération en cours...',
+    'voice.player.title':  'Voix Cancan',
+    'voice.error':         'Erreur lors de la génération de la voix.',
+    'voice.success':       'Voix générée avec succès !',
+
     // Videos
     'videos.title': 'Mes Vidéos',
     'videos.generate': 'Générer la vidéo',
@@ -173,6 +180,13 @@ export const translations = {
     'scripts.status.draft': 'Draft',
     'scripts.status.ready': 'Ready',
     'scripts.status.used': 'Used',
+
+    // Voice
+    'voice.generate':      '🎤 Generate voice',
+    'voice.generating':    'Generating...',
+    'voice.player.title':  'Cancan Voice',
+    'voice.error':         'Voice generation failed.',
+    'voice.success':       'Voice generated successfully!',
 
     // Videos
     'videos.title': 'My Videos',

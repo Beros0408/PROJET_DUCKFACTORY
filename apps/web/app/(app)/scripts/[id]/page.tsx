@@ -3,7 +3,9 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import BackButton from '@/components/common/BackButton'
+import VoicePlayer from '@/components/scripts/VoicePlayer'
 import { fetchScript, deleteScript, type Script } from '@/lib/api/scripts'
+import { fetchVoiceover, type Voiceover } from '@/lib/api/voiceovers'
 
 const FORMAT_LABELS: Record<string, string> = {
   tiktok_60s:   'TikTok 60s',
@@ -59,15 +61,19 @@ export default function ScriptDetailPage() {
   const router  = useRouter()
   const id      = params.id as string
   const [lang]                    = useState<'fr' | 'en'>('fr')
-  const [script, setScript]       = useState<Script | null>(null)
-  const [loading, setLoading]     = useState(true)
-  const [error, setError]         = useState('')
-  const [deleting, setDeleting]   = useState(false)
+  const [script, setScript]           = useState<Script | null>(null)
+  const [voiceover, setVoiceover]     = useState<Voiceover | null>(null)
+  const [loading, setLoading]         = useState(true)
+  const [error, setError]             = useState('')
+  const [deleting, setDeleting]       = useState(false)
   const t = tr[lang]
 
   useEffect(() => {
-    fetchScript(id)
-      .then(setScript)
+    Promise.all([
+      fetchScript(id),
+      fetchVoiceover(id).catch(() => null),
+    ])
+      .then(([s, v]) => { setScript(s); setVoiceover(v) })
       .catch(() => setError(t.notFound))
       .finally(() => setLoading(false))
   }, [id, t.notFound])
@@ -154,6 +160,9 @@ export default function ScriptDetailPage() {
           {script.content}
         </pre>
       </div>
+
+      {/* Voice generation */}
+      <VoicePlayer scriptId={id} existingVoiceover={voiceover} lang={lang} />
 
       {error && (
         <div className="mt-4 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-5 py-4">
