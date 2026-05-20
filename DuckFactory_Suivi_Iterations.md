@@ -1,13 +1,13 @@
-﻿# 🦆 DuckFactory — Suivi des iterations
+﻿# DuckFactory - Suivi des iterations
 
-## IT-001 (FAIT) — Setup monorepo Turborepo
+## IT-001 (FAIT) - Setup monorepo Turborepo
 Date : Mai 2026
 - Monorepo Turborepo + pnpm
 - Frontend Next.js 14.2.35
 - Backend FastAPI (deprecie, migre vers routes Next.js)
 - Supabase configure
 
-## IT-002 (FAIT) — Auth + Landing premium bilingue
+## IT-002 (FAIT) - Auth + Landing premium bilingue
 Date : Mai 2026
 - Auth Supabase (email/password + confirmation)
 - Landing page premium (palette ocean blue + coral)
@@ -15,7 +15,7 @@ Date : Mai 2026
 - Bilingue FR/EN
 - Middleware de protection
 
-## IT-003 (FAIT) — Module Personnages
+## IT-003 (FAIT) - Module Personnages
 Date : 18 mai 2026
 - Table characters Supabase + RLS
 - Wizard de creation en 4 etapes
@@ -23,85 +23,65 @@ Date : 18 mai 2026
 - Pages : /characters, /characters/new, /characters/[id]
 - Premier personnage cree : Cancan le Canard
 
----
-
-## IT-004 (LIVREE) — Generation de scripts IA
-
-Statut : Livree et validee en production
+## IT-004 (LIVREE) - Generation de scripts IA
 Date : 19 mai 2026
-Commits : bd2af66, 59832b1, 2482d7f, 8033f4b
+Statut : Livree et validee en production
+Commits : bd2af66, 59832b1, 2482d7f, 8033f4b, 233f60f
 
 ### Livrables techniques
-- Migration SQL 002_scripts.sql (table + RLS + indexes + trigger)
-- Route streaming POST /api/scripts/generate (Vercel AI SDK v6, GPT-4o, edge runtime)
-- Route CRUD GET /api/scripts (filtre optionnel par character_id)
-- Route CRUD GET/DELETE /api/scripts/[id]
-- Helper client lib/api/scripts.ts
-- Composant ScriptGenerator.tsx (form + streaming UI fetch natif)
-- Composant ScriptCard.tsx (liste)
-- Page /scripts (liste avec empty state)
-- Page /scripts/new (creation)
-- Page /scripts/[id] (detail + delete)
-- AppSidebar : Scripts actif
-- Dashboard : carte Scripts cliquable
+- Migration SQL 002_scripts.sql
+- Route streaming POST /api/scripts/generate (Vercel AI SDK v6, GPT-4o)
+- Routes CRUD /api/scripts et /api/scripts/[id]
+- Composants : ScriptGenerator, ScriptCard
+- Pages : /scripts, /scripts/new, /scripts/[id]
 - i18n FR/EN complet
-- .env.example mis a jour avec OPENAI_API_KEY
-
-### Activations production
-- Cle OpenAI creee sur platform.openai.com
-- Credit OpenAI recharge (9,62$ avec auto-recharge a 5$ -> 10$)
-- Variable OPENAI_API_KEY ajoutee dans Vercel (Production + Preview)
-- Migration SQL executee dans Supabase
 
 ### Validation qualite (3 tests en production)
-- Test 1 : 5 astuces pour devenir viral sur TikTok -> 9,5/10
-- Test 2 : L'intelligence artificielle expliquee simplement -> 9/10
-- Test 3 : Comment lancer son entreprise en France -> 8,5/10
+- Test 1 : 5 astuces TikTok -> 9,5/10
+- Test 2 : IA expliquee -> 9/10
+- Test 3 : Entreprise France -> 8,5/10
 - Moyenne : 9/10
 
-### Cancan mis a jour en BDD (Supabase Table Editor)
-- name : Cancan le Canard
-- description : Un canard jaune naif et debrouillard, drole et pedagogue
-- catchphrase : Coin coin !
-- tic_verbal : En fait, c'est tres simple...
-- tone : adult
-- personality : naif
-- language : fr
+---
+
+## IT-005 (EN PAUSE - blocage commercial) - Generation voix Cancan
+Date : 20-21 mai 2026
+Statut : Code livre en production, bloque par restriction API ElevenLabs Free
+Commit : b12d283
+
+### Livrables techniques FAITS
+- Migration SQL 003_voiceovers.sql executee dans Supabase
+- Route API POST /api/scripts/[id]/generate-voice (Node runtime, maxDuration 60)
+- Helper lib/api/voiceovers.ts (generateVoice, fetchVoiceover)
+- Composant VoicePlayer.tsx (bouton jaune + spinner + audio HTML)
+- Page detail script integre VoicePlayer
+- i18n FR/EN ajoute (voice.generate, voice.generating, voice.player.title, voice.error, voice.success)
+- Bucket Supabase Storage "voiceovers" cree (mode Private)
+
+### Configuration ElevenLabs faite
+- Compte cree (plan Free, 10k caracteres/mois)
+- Voix Maxime - Young and Casual ajoutee (voice_id : 5Qfm4RqcAer0xoyWtoHC)
+- Voix Troy - Cartoon Hero ajoutee en backup (voice_id : 4TfTGcPwoefWe878B0rm)
+- Cle API "DuckFactory Production" creee (permissions : Text to Speech Acces, Voix Lire)
+- Variables ELEVENLABS_API_KEY et ELEVENLABS_VOICE_ID configurees dans Vercel
+
+### BLOCAGE IDENTIFIE
+Erreur retournee par ElevenLabs lors du test final :
+"Free users cannot use library voices via the API. Please upgrade your subscription to use this voice."
+
+Restriction commerciale : les voix de la bibliotheque ElevenLabs ne sont accessibles via l'API que pour les comptes payants.
+
+### Reste a faire pour debloquer IT-005
+1. Choisir une des 3 options demain :
+   - Option A : Plan Starter 6$/mois ElevenLabs
+   - Option B : Voice Cloning Free (enregistrer sa voix)
+   - Option C : Bascule vers OpenAI TTS
+2. Configurer RLS policies du bucket Supabase Storage "voiceovers"
+3. Tester la generation et ecouter Cancan parler
 
 ---
 
-## IT-005 (EN COURS) — Generation voix Cancan
-
-Statut : En cours (configuration ElevenLabs entamee)
-Date prevue : 20 mai 2026 (demain)
-
-### Avancement actuel
-- Compte ElevenLabs cree (plan Free)
-- Studio Text-to-Speech explore
-- Voix Roger testee (verdict : trop humaine, pas assez canard)
-- Choix de voix en attente
-
-### Decision strategique en cours
-- Option A : Voix expressive humaine ce soir (provisoire) -> Voice Cloning payant dans 2-3 semaines
-- Option B : Voice Cloning payant tout de suite (plan Starter 6$/mois)
-- A trancher demain a tete reposee
-
-### Idee creative a explorer
-Voix legerement nasillarde pour Cancan (signature canard, type Donald Duck leger).
-Faisable uniquement via Voice Cloning Pro (plan Creator 11$/mois) en enregistrant TA voix.
-
-### Reste a faire pour IT-005
-- Tester 5 voix candidates dans la Voice Library
-- Choisir voice_id provisoire OU acheter plan payant
-- Migration SQL : table voiceovers ou colonne audio_url dans scripts
-- Route API POST /api/scripts/[id]/generate-voice
-- Composant audio player
-- Activation bouton "Generer la voix" (actuellement disabled)
-- Stockage fichiers MP3 (Supabase Storage)
-
----
-
-## IT-006+ — Roadmap future (differee)
+## IT-006+ - Roadmap future (differee)
 
 - IT-006 : Avatar parlant (HeyGen ou alternative)
 - IT-006b : Montage final + sous-titres (Remotion)

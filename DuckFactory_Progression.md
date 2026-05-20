@@ -1,112 +1,100 @@
-﻿# 🦆 DuckFactory — Progression du projet
+﻿# DuckFactory - Progression du projet
 
-Derniere mise a jour : 19 mai 2026
+Derniere mise a jour : 21 mai 2026
 
 ---
 
-## 🎯 Etat global
+## Etat global
 
 DuckFactory est un SaaS B2C pour createurs de contenu francophones.
-Permet de generer des videos virales (TikTok, Reels, Shorts) avec un
-personnage IA recurrent (Cancan le Canard par defaut).
+Permet de generer des scripts video viraux avec un personnage IA (Cancan le Canard).
+Etape suivante : ajouter la generation de voix audio.
 
-Stade actuel : MVP en production, generation de scripts operationnelle.
+Stade actuel : MVP en production, generation de scripts operationnelle, voix bloquee.
 
 ---
 
-## ✅ Fonctionnalites LIVREES (en production)
+## Fonctionnalites LIVREES (en production)
 
 ### Landing page premium
-- Bilingue FR/EN
-- 6 sections (Hero, Features, How It Works, Pricing, FAQ, CTA)
-- Design Palette B ocean blue + coral
-- Responsive mobile-first
+- Bilingue FR/EN, 6 sections, design ocean blue + coral
 
 ### Authentification
 - Supabase Auth (email + password)
-- Confirmation email
-- Reset password
-- Middleware de protection des routes privees
+- Confirmation email + Reset password
+- Middleware de protection
 
 ### Module Personnages (IT-003)
 - Wizard de creation en 4 etapes
-- CRUD complet via routes Next.js + Supabase
-- Page liste, detail, creation, modification
-- BackButton reutilisable
+- CRUD complet
+- Cancan le Canard cree
 
-### Module Scripts (IT-004) — NOUVEAU
+### Module Scripts (IT-004)
 - Generation IA via GPT-4o en streaming
-- System prompt enrichi avec personnalite du personnage
-- Formats supportes : TikTok 30s/60s, Reels 60s, Shorts 60s, YouTube 5min
-- 4 tonalites : kid-friendly, adolescent, adulte, expert
-- Slider de duree 15-300s
-- Sauvegarde automatique en BDD
-- Page liste avec empty state
-- Page detail avec actions (copier, regenerer, supprimer)
+- 5 formats : TikTok 30s/60s, Reels 60s, Shorts 60s, YouTube 5min
+- Qualite validee 9/10 sur 3 tests
+
+### Module Voix (IT-005) - Code livre mais bloque
+- Code technique entierement livre
+- Migration SQL appliquee
+- Bucket Supabase cree
+- Bloque par restriction commerciale ElevenLabs Free
 
 ---
 
-## 🚧 Fonctionnalites EN COURS
-
-### Module Voix (IT-005)
-- Compte ElevenLabs cree
-- Exploration des voix en cours
-- Integration dev pas encore commencee
-
----
-
-## 📋 Roadmap (ordre de priorite)
+## Roadmap (ordre de priorite)
 
 ### Court terme (1-2 semaines)
-1. IT-005 — Voix Cancan (ElevenLabs)
-2. IT-006 — Avatar parlant (HeyGen ou D-ID)
-3. IT-006b — Montage final + sous-titres (Remotion)
+1. Resoudre IT-005 (choix de la solution voix demain)
+2. RLS policies du bucket voiceovers
+3. Premiere video TikTok publiee
+4. IT-006 - Avatar parlant (HeyGen ou D-ID)
+5. IT-006b - Montage final + sous-titres (Remotion)
 
 ### Moyen terme (3-6 semaines)
-4. IT-007 — Publication multi-plateforme (TikTok, YouTube, Instagram)
-5. IT-008 — Pricing + Stripe (4 plans : Free / Creator 49€ / Pro 99€ / Agency 299€)
+6. IT-007 - Publication multi-plateforme
+7. IT-008 - Pricing + Stripe
 
 ### Long terme (2-3 mois)
-6. IT-009 — Analytics utilisateur
-7. IT-010 — Mascotte officielle (canard photorealiste TikTok)
-8. Rebranding eventuel DuckFactory -> DuckStories (a valider quand 50+ clients)
+8. IT-009 - Analytics
+9. IT-010 - Mascotte officielle
+10. Voice Cloning Pro de Cancan
 
 ---
 
-## 🏆 Achievements unlocked
+## Achievements unlocked
 
 - 18 mai 2026 : Cancan le Canard officiellement ne en BDD
-- 19 mai 2026 : Premier script IA genere par Cancan en production
-- Stack moderne et scalable mis en place
-- 0€ de couts mensuels jusqu'a ~25 videos generees
+- 19 mai 2026 : Premier script IA genere par Cancan (qualite 9/10)
+- 21 mai 2026 : Skills Claude Code installes + IT-005 livre techniquement
 
 ---
 
-## 📊 Indicateurs MVP
+## Stack technique (rappel)
 
-- Routes API actives : 7
-- Pages frontend : 12
-- Tables Supabase : 2 (characters, scripts)
-- Commits sur main : 30+
-- Personnages crees : 1 (Cancan)
-- Scripts generes : 3 (tests qualite)
-- Qualite moyenne scripts : 9/10
+- Frontend : Next.js 14.2.35 (App Router, TypeScript, Tailwind)
+- Backend : Routes API Next.js (Edge/Node selon route)
+- Database : Supabase (project ref : jcsrirxscnazngyjufai)
+- Auth : Supabase SSR (RLS automatique)
+- IA scripts : OpenAI GPT-4o via Vercel AI SDK v6
+- IA voix : ElevenLabs (en cours de configuration)
+- Storage : Supabase Storage (bucket voiceovers)
+- Hosting : Vercel (https://duckfactory-zeta.vercel.app)
 
 ---
 
-## 🎯 Vision long terme
+## Couts mensuels
 
-Annee 1 (mai 2026 -> mai 2027) :
-- Objectif : 50-150 clients payants
-- Revenue cible : 2 500-7 500€ MRR
-- Cancan devient personnage TikTok identifiable
+- Vercel : 0 EUR (free tier)
+- Supabase : 0 EUR (free tier)
+- GitHub : 0 EUR (public repo)
+- OpenAI : 9,62 USD de credit en stock
+- ElevenLabs : 0 EUR (Free, mais bloque pour l'API)
+- TOTAL : ~0 EUR / mois actuellement
 
-Annee 2 (mai 2027 -> mai 2028) :
-- 300-500 clients
-- Voice cloning officiel de Cancan
-- Premier acteur francais du SaaS video IA
+---
 
-Annee 3+ :
-- Multi-personnages (utilisateurs creent leurs propres canards)
-- 1000+ clients
-- Marketplace de personnages IA
+## URL a utiliser (pour CV, demos, etc.)
+
+- Demo en ligne : https://duckfactory-zeta.vercel.app
+- Code source : https://github.com/Beros0408/PROJET_DUCKFACTORY
