@@ -73,6 +73,14 @@ export const translations = {
     'voice.error':         'Erreur lors de la génération de la voix.',
     'voice.success':       'Voix générée avec succès !',
 
+    // Video (single video generation flow)
+    'video.generate':      '🎬 Générer la vidéo',
+    'video.generating':    'Transcription + préparation...',
+    'video.player.title':  '🎬 Vidéo Cancan',
+    'video.error':         'Erreur lors de la génération de la vidéo.',
+    'video.success':       'Vidéo prête !',
+    'video.command_hint':  'Lance cette commande dans ton terminal pour render la vidéo :',
+
     // Videos
     'videos.title': 'Mes Vidéos',
     'videos.generate': 'Générer la vidéo',
@@ -187,6 +195,14 @@ export const translations = {
     'voice.player.title':  'Cancan Voice',
     'voice.error':         'Voice generation failed.',
     'voice.success':       'Voice generated successfully!',
+
+    // Video (single video generation flow)
+    'video.generate':      '🎬 Generate video',
+    'video.generating':    'Transcribing + preparing...',
+    'video.player.title':  '🎬 Cancan Video',
+    'video.error':         'Video generation failed.',
+    'video.success':       'Video ready!',
+    'video.command_hint':  'Run this command in your terminal to render the video:',
 
     // Videos
     'videos.title': 'My Videos',
