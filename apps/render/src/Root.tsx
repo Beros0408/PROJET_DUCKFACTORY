@@ -4,6 +4,8 @@ import { CancanVideo } from './CancanVideo'
 
 const DEFAULT_FPS = 30
 const DEFAULT_DURATION_SECONDS = 60
+const MASCOT_URL =
+  'https://jcsrirxscnazngyjufai.supabase.co/storage/v1/object/public/assets/cancan-mascot.png'
 
 export const RemotionRoot: React.FC = () => (
   <Composition
@@ -16,6 +18,7 @@ export const RemotionRoot: React.FC = () => (
     defaultProps={{
       audioUrl: '',
       subtitles: [],
+      mascotImageUrl: MASCOT_URL,
     }}
   />
 )

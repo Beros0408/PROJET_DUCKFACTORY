@@ -1,5 +1,5 @@
 import React from 'react'
-import { AbsoluteFill, Audio, useCurrentFrame, useVideoConfig } from 'remotion'
+import { AbsoluteFill, Audio, Img, useCurrentFrame, useVideoConfig } from 'remotion'
 
 export interface Subtitle {
   word: string
@@ -7,21 +7,30 @@ export interface Subtitle {
   end: number
 }
 
+const MASCOT_URL =
+  'https://jcsrirxscnazngyjufai.supabase.co/storage/v1/object/public/assets/cancan-mascot.png'
+
 export interface CancanVideoProps {
   audioUrl: string
   subtitles: Subtitle[]
+  mascotImageUrl?: string
 }
 
 const WINDOW_BEFORE = 5
 const WINDOW_AFTER = 8
 
-export const CancanVideo: React.FC<CancanVideoProps> = ({ audioUrl, subtitles }) => {
+export const CancanVideo: React.FC<CancanVideoProps> = ({
+  audioUrl,
+  subtitles,
+  mascotImageUrl = MASCOT_URL,
+}) => {
   const frame = useCurrentFrame()
   const { fps } = useVideoConfig()
   const currentTime = frame / fps
 
-  // Gentle duck oscillation: ±10px vertical sine wave
-  const oscillationY = Math.sin(frame * 0.08) * 10
+  // Subtle oscillation: slight rotation + gentle vertical bob
+  const oscillationY = Math.sin(frame * 0.08) * 6
+  const oscillationRot = Math.sin(frame * 0.06) * 2
 
   const currentIdx = subtitles.findIndex(
     (s) => currentTime >= s.start && currentTime < s.end,
@@ -47,26 +56,38 @@ export const CancanVideo: React.FC<CancanVideoProps> = ({ audioUrl, subtitles })
         fontFamily: 'system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif',
       }}
     >
-      {/* Mascot emoji */}
+      {/* Mascot image (500px wide, centered, animated) */}
       <div
         style={{
           position: 'absolute',
-          top: 100,
+          top: 80,
           left: 0,
           right: 0,
           display: 'flex',
           justifyContent: 'center',
-          transform: `translateY(${oscillationY}px)`,
+          transform: `translateY(${oscillationY}px) rotate(${oscillationRot}deg)`,
         }}
       >
-        <span style={{ fontSize: 300, lineHeight: 1 }}>🦆</span>
+        {mascotImageUrl ? (
+          <Img
+            src={mascotImageUrl}
+            style={{
+              width: 500,
+              height: 'auto' as unknown as number,
+              borderRadius: 24,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+            }}
+          />
+        ) : (
+          <span style={{ fontSize: 300, lineHeight: 1 }}>🦆</span>
+        )}
       </div>
 
-      {/* Subtitle area */}
+      {/* Subtitle area — starts 80px below mascot (~500px tall) */}
       <div
         style={{
           position: 'absolute',
-          top: 540,
+          top: 660,
           left: 40,
           right: 40,
           bottom: 120,
@@ -87,7 +108,7 @@ export const CancanVideo: React.FC<CancanVideoProps> = ({ audioUrl, subtitles })
             <span
               key={globalIdx}
               style={{
-                fontSize: 72,
+                fontSize: 56,
                 fontWeight: 800,
                 lineHeight: 1.4,
                 color: isCurrent ? '#1a1a1a' : isPast ? '#0f172a' : '#94a3b8',
