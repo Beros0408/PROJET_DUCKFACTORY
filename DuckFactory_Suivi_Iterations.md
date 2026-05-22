@@ -44,48 +44,109 @@ Commits : bd2af66, 59832b1, 2482d7f, 8033f4b, 233f60f
 
 ---
 
-## IT-005 (EN PAUSE - blocage commercial) - Generation voix Cancan
-Date : 20-21 mai 2026
-Statut : Code livre en production, bloque par restriction API ElevenLabs Free
+## IT-005 (LIVREE) - Generation voix Cancan ElevenLabs
+Date : 21-22 mai 2026
+Statut : Livree et fonctionnelle en production
 Commit : b12d283
 
-### Livrables techniques FAITS
-- Migration SQL 003_voiceovers.sql executee dans Supabase
-- Route API POST /api/scripts/[id]/generate-voice (Node runtime, maxDuration 60)
-- Helper lib/api/voiceovers.ts (generateVoice, fetchVoiceover)
-- Composant VoicePlayer.tsx (bouton jaune + spinner + audio HTML)
+### Livrables techniques
+- Migration SQL 003_voiceovers.sql executee
+- Route API POST /api/scripts/[id]/generate-voice
+- Helper lib/api/voiceovers.ts
+- Composant VoicePlayer.tsx
 - Page detail script integre VoicePlayer
-- i18n FR/EN ajoute (voice.generate, voice.generating, voice.player.title, voice.error, voice.success)
-- Bucket Supabase Storage "voiceovers" cree (mode Private)
+- i18n FR/EN ajoute
+- Bucket Supabase Storage voiceovers + 4 RLS policies
 
-### Configuration ElevenLabs faite
-- Compte cree (plan Free, 10k caracteres/mois)
-- Voix Maxime - Young and Casual ajoutee (voice_id : 5Qfm4RqcAer0xoyWtoHC)
-- Voix Troy - Cartoon Hero ajoutee en backup (voice_id : 4TfTGcPwoefWe878B0rm)
-- Cle API "DuckFactory Production" creee (permissions : Text to Speech Acces, Voix Lire)
-- Variables ELEVENLABS_API_KEY et ELEVENLABS_VOICE_ID configurees dans Vercel
+### Configuration ElevenLabs
+- Compte cree avec plan Starter 6$/mois (apres test Free bloque)
+- Voix Maxime - Young and Casual (voice_id 5Qfm4RqcAer0xoyWtoHC)
+- Voix Troy - Cartoon Hero en backup
+- Cle API DuckFactory Production
+- Variables ELEVENLABS_API_KEY et ELEVENLABS_VOICE_ID dans Vercel
 
-### BLOCAGE IDENTIFIE
-Erreur retournee par ElevenLabs lors du test final :
-"Free users cannot use library voices via the API. Please upgrade your subscription to use this voice."
-
-Restriction commerciale : les voix de la bibliotheque ElevenLabs ne sont accessibles via l'API que pour les comptes payants.
-
-### Reste a faire pour debloquer IT-005
-1. Choisir une des 3 options demain :
-   - Option A : Plan Starter 6$/mois ElevenLabs
-   - Option B : Voice Cloning Free (enregistrer sa voix)
-   - Option C : Bascule vers OpenAI TTS
-2. Configurer RLS policies du bucket Supabase Storage "voiceovers"
-3. Tester la generation et ecouter Cancan parler
+### Feedback utilisateur
+- Voix Maxime : trop humaine, sonne professeur, pas drole
+- Decision : on garde pour MVP, Voice Cloning prevu plus tard
 
 ---
 
-## IT-006+ - Roadmap future (differee)
+## IT-006b (LIVREE) - Generation videos TikTok Remotion (MVP local)
+Date : 22 mai 2026
+Statut : Livree en mode MVP local render
+Commits : 89ad7f4, a2b4f8a, 00e8890
 
-- IT-006 : Avatar parlant (HeyGen ou alternative)
-- IT-006b : Montage final + sous-titres (Remotion)
-- IT-007 : Publication YouTube/TikTok/Instagram (OAuth)
-- IT-008 : Pricing + Stripe (UNIQUEMENT apres produit complet)
-- IT-009 : Analytics et dashboard utilisateur
-- IT-010 : Mascotte officielle (canard photorealiste TikTok)
+### Livrables techniques
+- Setup apps/render avec Remotion 4+
+- Composant CancanVideo.tsx (1080x1920, 30fps, gradient yellow-100)
+- Composant Root.tsx avec registerRoot et defaultProps
+- Script CLI render.ts avec commander
+- Route /api/scripts/[id]/transcribe (OpenAI Whisper avec language fr)
+- Route /api/scripts/[id]/generate-video
+- Route GET /api/scripts/[id]/videos
+- Helper lib/api/videos.ts
+- Composant VideoPlayer.tsx (etats idle/pending/ready/error)
+- Migration SQL 004_videos.sql (table videos + scripts.subtitles JSONB)
+- Bucket Supabase videos + 4 RLS policies
+- Bucket Supabase assets (public) + cancan-mascot.png uploadee
+- i18n FR/EN complet
+
+### Architecture choisie
+- Transcription Whisper appelle depuis Vercel (cle OpenAI cote serveur)
+- Render Remotion en LOCAL sur le PC de Beros (MVP)
+- Upload final dans Supabase Storage bucket videos
+- Mascotte photorealiste hardcodee dans le composant Remotion
+
+### Decisions techniques
+- Render local au lieu de Lambda AWS : evite 4-6h de setup, MVP suffit
+- Pas d'avatar HeyGen pour V1 : economie 24$/mois
+- Pipeline TikTok-natif (voix + sous-titres + mascotte statique)
+- Image mascotte chargee depuis Supabase Storage URL publique
+
+### Resultats du premier test
+- Video V1 : 5.9 MB, 42s, emoji statique
+- Video V2 : 26.3 MB, 42s, mascotte photorealiste + police 56px
+- Feedback : mascotte visible mais statique, chevauchement texte/image
+- Limites identifiees : pas de lipsync, pas d'animation reelle
+
+### Reste a faire pour IT-006b (perfection)
+- Fixer chevauchement entre image et sous-titres
+- Ameliorer le placement / spacing
+
+### Limitations du MVP a accepter
+- Render local seulement (pas de clients commercialement viable)
+- Mascotte statique (pas de lipsync ni mouvement)
+- Pas de B-roll ni effets visuels avances
+
+---
+
+## IT-006 (PROCHAINE PRIORITE) - Avatar 3D parlant avec lipsync
+Date prevue : 1-2 semaines apres Harmoni
+Statut : A planifier
+
+### Objectif
+Remplacer la mascotte statique par un canard 3D anime qui parle, marche, et synchronise les levres avec l'audio.
+
+### Options a evaluer
+1. HeyGen (24$/mois) - reference du marche pour avatar IA
+2. Hedra (10$/mois) - permet animation d'images custom
+3. D-ID (6$/mois) - moins realiste
+4. Solutions open source (DeepMotion, etc.)
+
+### Travaux a prevoir
+- Choix du service prestataire
+- Setup API et integration
+- Refonte du pipeline Remotion
+- Tests et iterations
+- Verification budget vs ROI
+
+---
+
+## IT-007+ - Roadmap future (apres IT-006)
+
+- IT-007 : Voice Cloning de la vraie voix Cancan (Beros enregistre)
+- IT-008 : Publication YouTube/TikTok/Instagram (OAuth)
+- IT-009 : Pricing + Stripe (uniquement apres produit complet)
+- IT-010 : Migration Lambda AWS (quand 10-20+ users)
+- IT-011 : Analytics et dashboard utilisateur
+- IT-012 : Mascotte officielle (animations avancees)
