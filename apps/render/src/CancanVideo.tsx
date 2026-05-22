@@ -1,5 +1,5 @@
 import React from 'react'
-import { AbsoluteFill, Audio, Img, useCurrentFrame, useVideoConfig } from 'remotion'
+import { AbsoluteFill, Audio, useCurrentFrame, useVideoConfig } from 'remotion'
 
 export interface Subtitle {
   word: string
@@ -10,27 +10,23 @@ export interface Subtitle {
 export interface CancanVideoProps {
   audioUrl: string
   subtitles: Subtitle[]
-  mascotImageUrl?: string | null
-  durationInSeconds: number
 }
 
 const WINDOW_BEFORE = 5
 const WINDOW_AFTER = 8
 
-export const CancanVideo: React.FC<CancanVideoProps> = ({
-  audioUrl,
-  subtitles,
-  mascotImageUrl,
-}) => {
+export const CancanVideo: React.FC<CancanVideoProps> = ({ audioUrl, subtitles }) => {
   const frame = useCurrentFrame()
   const { fps } = useVideoConfig()
   const currentTime = frame / fps
+
+  // Gentle duck oscillation: ±10px vertical sine wave
+  const oscillationY = Math.sin(frame * 0.08) * 10
 
   const currentIdx = subtitles.findIndex(
     (s) => currentTime >= s.start && currentTime < s.end,
   )
 
-  // Fallback to last spoken word if between words
   const refIdx = (() => {
     if (currentIdx >= 0) return currentIdx
     let last = -1
@@ -47,52 +43,39 @@ export const CancanVideo: React.FC<CancanVideoProps> = ({
   return (
     <AbsoluteFill
       style={{
-        background: 'linear-gradient(to bottom, #fef9c3, #ffffff)',
-        fontFamily:
-          '-apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif',
+        background: 'linear-gradient(180deg, #fef3c7, #ffffff)',
+        fontFamily: 'system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif',
       }}
     >
-      {/* Mascot */}
+      {/* Mascot emoji */}
       <div
         style={{
           position: 'absolute',
-          top: 120,
+          top: 100,
           left: 0,
           right: 0,
           display: 'flex',
           justifyContent: 'center',
-          alignItems: 'center',
+          transform: `translateY(${oscillationY}px)`,
         }}
       >
-        {mascotImageUrl ? (
-          <Img
-            src={mascotImageUrl}
-            style={{
-              width: 280,
-              height: 280,
-              borderRadius: '50%',
-              objectFit: 'cover',
-              border: '6px solid #facc15',
-            }}
-          />
-        ) : (
-          <div style={{ fontSize: 240, lineHeight: 1 }}>🦆</div>
-        )}
+        <span style={{ fontSize: 300, lineHeight: 1 }}>🦆</span>
       </div>
 
       {/* Subtitle area */}
       <div
         style={{
           position: 'absolute',
-          top: 520,
-          left: 60,
-          right: 60,
-          bottom: 160,
+          top: 540,
+          left: 40,
+          right: 40,
+          bottom: 120,
           display: 'flex',
           flexWrap: 'wrap',
-          gap: '8px 14px',
+          gap: '10px 16px',
           alignContent: 'flex-start',
           overflow: 'hidden',
+          padding: '0 40px',
         }}
       >
         {visibleWords.map((sub, i) => {
@@ -104,20 +87,39 @@ export const CancanVideo: React.FC<CancanVideoProps> = ({
             <span
               key={globalIdx}
               style={{
-                fontSize: isCurrent ? 72 : 62,
-                fontWeight: 900,
+                fontSize: 72,
+                fontWeight: 800,
+                lineHeight: 1.4,
                 color: isCurrent ? '#1a1a1a' : isPast ? '#0f172a' : '#94a3b8',
                 backgroundColor: isCurrent ? '#facc15' : 'transparent',
-                padding: isCurrent ? '4px 14px' : '4px 4px',
-                borderRadius: 12,
-                lineHeight: 1.25,
+                padding: isCurrent ? '4px 16px' : '4px 4px',
+                borderRadius: 14,
                 display: 'inline-block',
+                transform: isCurrent ? 'scale(1.15)' : 'scale(1)',
+                transformOrigin: 'left center',
               }}
             >
               {sub.word}
             </span>
           )
         })}
+      </div>
+
+      {/* Footer */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 50,
+          left: 0,
+          right: 0,
+          textAlign: 'center',
+          fontSize: 24,
+          fontWeight: 400,
+          color: '#cbd5e1',
+          letterSpacing: 1,
+        }}
+      >
+        DuckFactory.app
       </div>
 
       {audioUrl ? <Audio src={audioUrl} /> : null}

@@ -18,7 +18,8 @@ CREATE TABLE IF NOT EXISTS public.videos (
   video_url         TEXT,
   duration_seconds  INTEGER,
   file_size_bytes   BIGINT,
-  status            TEXT        NOT NULL DEFAULT 'pending',
+  status            TEXT        NOT NULL DEFAULT 'pending'
+                                CHECK (status IN ('pending', 'rendering', 'ready', 'failed')),
   error_message     TEXT,
   created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -48,6 +49,7 @@ CREATE POLICY "videos: delete own"
 
 -- ============================================================
 -- TRIGGER updated_at
+-- (handle_updated_at already exists from 001_characters.sql)
 -- ============================================================
 DROP TRIGGER IF EXISTS on_videos_updated ON public.videos;
 CREATE TRIGGER on_videos_updated
@@ -62,15 +64,15 @@ CREATE INDEX IF NOT EXISTS videos_script_id_idx   ON public.videos (script_id);
 CREATE INDEX IF NOT EXISTS videos_created_at_idx  ON public.videos (created_at DESC);
 
 -- ============================================================
--- STORAGE BUCKET "videos"  (manuel via Dashboard)
+-- STORAGE BUCKET "videos"  (création manuelle via Dashboard)
 -- ============================================================
 -- 1. Aller sur : https://supabase.com/dashboard/project/jcsrirxscnazngyjufai/storage/buckets
 -- 2. Cliquer "New bucket"
 -- 3. Name : videos
--- 4. Cocher "Private bucket" (ne pas activer l'accès public)
+-- 4. Cocher "Private bucket"
 -- 5. Cliquer "Create bucket"
 --
--- Ensuite, dans Storage > Policies > videos, ajouter ces 4 policies :
+-- Ensuite, dans Storage > Policies > bucket "videos", créer 4 policies :
 --
 -- Policy 1 — SELECT
 -- Nom : "videos storage: select own"
@@ -93,4 +95,3 @@ CREATE INDEX IF NOT EXISTS videos_created_at_idx  ON public.videos (created_at D
 -- Expression : (auth.uid())::text = (storage.foldername(name))[1]
 --
 -- Convention de path : [user_id]/[script_id]/video.mp4
--- Exemple : a1b2c3.../d4e5f6.../video.mp4

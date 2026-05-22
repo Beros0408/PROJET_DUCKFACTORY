@@ -13,11 +13,9 @@ export interface Video {
 
 export interface VideoGenerationResult {
   videoId: string
-  command: string
-  audioUrl: string
-  subtitles: Array<{ word: string; start: number; end: number }>
-  mascotImageUrl: string | null
-  video: Video
+  status: 'pending'
+  renderCommand: string
+  message: string
 }
 
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
@@ -34,7 +32,12 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const fetchVideo = (scriptId: string): Promise<Video | null> =>
-  apiFetch(`/api/scripts/${scriptId}/generate-video`)
+  apiFetch(`/api/scripts/${scriptId}/videos`)
 
 export const generateVideo = (scriptId: string): Promise<VideoGenerationResult> =>
   apiFetch(`/api/scripts/${scriptId}/generate-video`, { method: 'POST' })
+
+export const transcribeScript = (
+  scriptId: string,
+): Promise<{ subtitles: Array<{ word: string; start: number; end: number }>; duration: number | null }> =>
+  apiFetch(`/api/scripts/${scriptId}/transcribe`, { method: 'POST' })

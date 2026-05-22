@@ -8,25 +8,6 @@ interface RouteContext {
   params: { id: string }
 }
 
-export async function GET(_req: NextRequest, { params }: RouteContext) {
-  const supabase = createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return new Response('Unauthorized', { status: 401 })
-
-  const { data: video } = await supabase
-    .from('videos')
-    .select('*')
-    .eq('script_id', params.id)
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle()
-
-  return Response.json(video ?? null)
-}
-
 export async function POST(_req: NextRequest, { params }: RouteContext) {
   const supabase = createClient()
   const {
@@ -34,10 +15,10 @@ export async function POST(_req: NextRequest, { params }: RouteContext) {
   } = await supabase.auth.getUser()
   if (!user) return new Response('Unauthorized', { status: 401 })
 
-  // Fetch script + character avatar
+  // Fetch script
   const { data: script } = await supabase
     .from('scripts')
-    .select('id, user_id, subtitles, characters(avatar_url)')
+    .select('id, user_id, subtitles')
     .eq('id', params.id)
     .eq('user_id', user.id)
     .single()
@@ -56,51 +37,18 @@ export async function POST(_req: NextRequest, { params }: RouteContext) {
   if (!voiceover?.audio_url) {
     return Response.json(
       { detail: 'No voiceover found. Generate voice first.' },
-      { status: 400 },
+      { status: 404 },
     )
   }
 
-  // Transcribe if subtitles are missing
-  let subtitles = script.subtitles as Array<{ word: string; start: number; end: number }> | null
-
+  // Require subtitles — caller must run /transcribe first
+  const subtitles = script.subtitles as Array<{ word: string; start: number; end: number }> | null
   if (!subtitles || subtitles.length === 0) {
-    const audioRes = await fetch(voiceover.audio_url)
-    if (!audioRes.ok) {
-      return Response.json({ detail: 'Failed to download audio for transcription' }, { status: 502 })
-    }
-    const audioBuffer = await audioRes.arrayBuffer()
-
-    const form = new FormData()
-    form.append('file', new Blob([audioBuffer], { type: 'audio/mpeg' }), 'voice.mp3')
-    form.append('model', 'whisper-1')
-    form.append('response_format', 'verbose_json')
-    form.append('timestamp_granularities[]', 'word')
-
-    const whisperRes = await fetch('https://api.openai.com/v1/audio/transcriptions', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
-      body: form,
-    })
-
-    if (!whisperRes.ok) {
-      const errText = await whisperRes.text()
-      return Response.json({ detail: `Transcription failed: ${errText}` }, { status: 502 })
-    }
-
-    const transcription = await whisperRes.json()
-    subtitles = transcription.words ?? []
-
-    await supabase.from('scripts').update({ subtitles }).eq('id', params.id)
+    return Response.json(
+      { detail: 'Run /transcribe first. No subtitles found for this script.' },
+      { status: 400 },
+    )
   }
-
-  // Mascot image URL
-  const charactersData = script.characters as
-    | { avatar_url: string | null }
-    | Array<{ avatar_url: string | null }>
-    | null
-  const mascotImageUrl = Array.isArray(charactersData)
-    ? (charactersData[0]?.avatar_url ?? null)
-    : (charactersData?.avatar_url ?? null)
 
   // Insert videos row
   const { data: videoRow, error: insertErr } = await supabase
@@ -116,11 +64,9 @@ export async function POST(_req: NextRequest, { params }: RouteContext) {
   return Response.json(
     {
       videoId: videoRow.id,
-      command: `pnpm --filter render render -- --script-id=${params.id}`,
-      audioUrl: voiceover.audio_url,
-      subtitles,
-      mascotImageUrl,
-      video: videoRow,
+      status: 'pending',
+      renderCommand: `pnpm --filter render render -- --script-id=${params.id}`,
+      message: 'Run this command locally to render the video',
     },
     { status: 201 },
   )

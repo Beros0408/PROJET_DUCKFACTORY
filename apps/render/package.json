@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "remotion studio src/index.tsx",
     "render": "tsx src/render.ts",
+    "studio": "remotion studio",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
@@ -12,6 +12,7 @@
     "@remotion/cli": "^4.0.0",
     "@remotion/renderer": "^4.0.0",
     "@supabase/supabase-js": "^2.46.2",
+    "commander": "^12.1.0",
     "dotenv": "^16.4.5",
     "remotion": "^4.0.0",
     "tsx": "^4.19.2"

@@ -74,12 +74,16 @@ export const translations = {
     'voice.success':       'Voix générée avec succès !',
 
     // Video (single video generation flow)
-    'video.generate':      '🎬 Générer la vidéo',
-    'video.generating':    'Transcription + préparation...',
-    'video.player.title':  '🎬 Vidéo Cancan',
-    'video.error':         'Erreur lors de la génération de la vidéo.',
-    'video.success':       'Vidéo prête !',
-    'video.command_hint':  'Lance cette commande dans ton terminal pour render la vidéo :',
+    'video.generate':        '🎬 Générer la vidéo',
+    'video.generating':      'Génération en cours...',
+    'video.pending_local':   'En attente du rendu local',
+    'video.command_hint':    'Lancez cette commande dans votre terminal :',
+    'video.copy_command':    'Copier la commande',
+    'video.command_copied':  'Copié !',
+    'video.ready':           'Vidéo prête',
+    'video.download':        '📥 Télécharger la vidéo',
+    'video.error':           'Erreur de génération',
+    'video.transcribing':    'Transcription audio en cours...',
 
     // Videos
     'videos.title': 'Mes Vidéos',
@@ -197,12 +201,16 @@ export const translations = {
     'voice.success':       'Voice generated successfully!',
 
     // Video (single video generation flow)
-    'video.generate':      '🎬 Generate video',
-    'video.generating':    'Transcribing + preparing...',
-    'video.player.title':  '🎬 Cancan Video',
-    'video.error':         'Video generation failed.',
-    'video.success':       'Video ready!',
-    'video.command_hint':  'Run this command in your terminal to render the video:',
+    'video.generate':        '🎬 Generate video',
+    'video.generating':      'Generating...',
+    'video.pending_local':   'Waiting for local render',
+    'video.command_hint':    'Run this command in your terminal:',
+    'video.copy_command':    'Copy command',
+    'video.command_copied':  'Copied!',
+    'video.ready':           'Video ready',
+    'video.download':        '📥 Download video',
+    'video.error':           'Generation error',
+    'video.transcribing':    'Transcribing audio...',
 
     // Videos
     'videos.title': 'My Videos',

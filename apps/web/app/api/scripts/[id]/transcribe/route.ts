@@ -17,7 +17,7 @@ export async function POST(_req: NextRequest, { params }: RouteContext) {
 
   const { data: script } = await supabase
     .from('scripts')
-    .select('id, user_id')
+    .select('id, user_id, language')
     .eq('id', params.id)
     .eq('user_id', user.id)
     .single()
@@ -34,28 +34,25 @@ export async function POST(_req: NextRequest, { params }: RouteContext) {
 
   if (!voiceover?.audio_url) {
     return Response.json(
-      { detail: 'No voiceover found. Generate voice first.' },
+      { detail: 'Voiceover required. Generate voice first.' },
       { status: 400 },
     )
   }
 
-  // Download the MP3 from Supabase Storage
+  // Download the MP3 from Supabase Storage (signed URL)
   const audioResponse = await fetch(voiceover.audio_url)
   if (!audioResponse.ok) {
     return Response.json({ detail: 'Failed to download audio' }, { status: 502 })
   }
   const audioBuffer = await audioResponse.arrayBuffer()
 
-  // Call OpenAI Whisper
+  // Call OpenAI Whisper with word-level timestamps
   const form = new FormData()
-  form.append(
-    'file',
-    new Blob([audioBuffer], { type: 'audio/mpeg' }),
-    'voice.mp3',
-  )
+  form.append('file', new Blob([audioBuffer], { type: 'audio/mpeg' }), 'voice.mp3')
   form.append('model', 'whisper-1')
   form.append('response_format', 'verbose_json')
   form.append('timestamp_granularities[]', 'word')
+  form.append('language', script.language ?? 'fr')
 
   const whisperRes = await fetch('https://api.openai.com/v1/audio/transcriptions', {
     method: 'POST',
@@ -82,5 +79,8 @@ export async function POST(_req: NextRequest, { params }: RouteContext) {
     return Response.json({ detail: updateErr.message }, { status: 500 })
   }
 
-  return Response.json({ words, text: transcription.text, duration: transcription.duration })
+  return Response.json({
+    subtitles: words,
+    duration: transcription.duration ?? null,
+  })
 }

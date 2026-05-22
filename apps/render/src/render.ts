@@ -1,26 +1,36 @@
 import { bundle } from '@remotion/bundler'
 import { renderMedia, selectComposition } from '@remotion/renderer'
 import { createClient } from '@supabase/supabase-js'
+import { Command } from 'commander'
 import { config as loadDotenv } from 'dotenv'
 import { readFileSync, mkdirSync, statSync } from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
-// Load env from render package dir and repo root
+// Load env: render package dir first, then repo root
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const repoRoot = path.resolve(__dirname, '..', '..', '..')
 
 loadDotenv({ path: path.join(__dirname, '..', '.env') })
 loadDotenv({ path: path.join(__dirname, '..', '.env.local') })
-loadDotenv({ path: path.join(repoRoot, '.env') })
 loadDotenv({ path: path.join(repoRoot, '.env.local') })
 
+// ─── CLI ────────────────────────────────────────────────────────────────────
+const program = new Command()
+program
+  .name('render')
+  .description('Render a CancanVideo locally and upload to Supabase Storage')
+  .requiredOption('--script-id <uuid>', 'Supabase script ID to render')
+  .parse(process.argv)
+
+const { scriptId } = program.opts<{ scriptId: string }>()
+
+// ─── Types ──────────────────────────────────────────────────────────────────
 interface ScriptRow {
   id: string
   user_id: string
   subtitles: Array<{ word: string; start: number; end: number }> | null
-  characters: { avatar_url: string | null } | null
 }
 
 interface VoiceoverRow {
@@ -33,42 +43,40 @@ interface VideoRow {
   user_id: string
 }
 
+// ─── Main ────────────────────────────────────────────────────────────────────
 async function main() {
-  const scriptId = process.argv
-    .find((a) => a.startsWith('--script-id='))
-    ?.split('=')[1]
-
-  if (!scriptId) {
-    console.error('Usage: pnpm --filter render render -- --script-id=<uuid>')
-    process.exit(1)
-  }
-
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL
-  const serviceKey =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
   if (!supabaseUrl || !serviceKey) {
-    console.error(
-      'Missing SUPABASE env vars. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in apps/render/.env',
-    )
+    console.error('❌ Missing env vars. Create apps/render/.env with:')
+    console.error('   NEXT_PUBLIC_SUPABASE_URL=...')
+    console.error('   SUPABASE_SERVICE_ROLE_KEY=...')
     process.exit(1)
   }
 
   const supabase = createClient(supabaseUrl, serviceKey)
 
-  console.log(`[render] Fetching script ${scriptId}...`)
-
+  // ── 1. Fetch script ────────────────────────────────────────────────────────
+  console.log(`⏳ Fetching script ${scriptId}...`)
   const { data: script, error: scriptErr } = await supabase
     .from('scripts')
-    .select('id, user_id, subtitles, characters(avatar_url)')
+    .select('id, user_id, subtitles')
     .eq('id', scriptId)
     .single<ScriptRow>()
 
   if (scriptErr || !script) {
-    console.error('Script not found:', scriptErr?.message)
+    console.error('❌ Script not found:', scriptErr?.message)
     process.exit(1)
   }
 
+  if (!script.subtitles || script.subtitles.length === 0) {
+    console.error('❌ No subtitles found. Call POST /api/scripts/' + scriptId + '/transcribe first.')
+    process.exit(1)
+  }
+
+  // ── 2. Fetch voiceover ────────────────────────────────────────────────────
+  console.log('⏳ Fetching voiceover...')
   const { data: voiceover, error: voiceErr } = await supabase
     .from('voiceovers')
     .select('id, audio_url')
@@ -78,16 +86,11 @@ async function main() {
     .maybeSingle<VoiceoverRow>()
 
   if (voiceErr || !voiceover?.audio_url) {
-    console.error('No voiceover found. Generate the voice first.')
+    console.error('❌ No voiceover found. Generate the voice first.')
     process.exit(1)
   }
 
-  if (!script.subtitles || script.subtitles.length === 0) {
-    console.error('No subtitles found. Run transcribe first via the web app.')
-    process.exit(1)
-  }
-
-  // Get the videos row (most recent pending)
+  // ── 3. Get or find videos row, update to rendering ────────────────────────
   const { data: videoRow } = await supabase
     .from('videos')
     .select('id, user_id')
@@ -98,50 +101,43 @@ async function main() {
 
   if (videoRow) {
     await supabase.from('videos').update({ status: 'rendering' }).eq('id', videoRow.id)
-    console.log(`[render] Video row ${videoRow.id} → rendering`)
+    console.log(`⏳ Video row ${videoRow.id} → rendering`)
   }
 
+  // ── 4. Compute duration from subtitles ────────────────────────────────────
   const subtitles = script.subtitles
   const lastWord = subtitles[subtitles.length - 1]
-  const durationInSeconds = (lastWord?.end ?? 60) + 0.8
+  const durationInSeconds = (lastWord?.end ?? 60) + 1.0  // +1s margin per spec
   const fps = 30
   const durationInFrames = Math.ceil(durationInSeconds * fps)
-
-  const mascotImageUrl =
-    Array.isArray(script.characters)
-      ? (script.characters[0] as { avatar_url: string | null } | undefined)?.avatar_url ?? null
-      : (script.characters as { avatar_url: string | null } | null)?.avatar_url ?? null
 
   const inputProps = {
     audioUrl: voiceover.audio_url,
     subtitles,
-    mascotImageUrl,
-    durationInSeconds,
   }
 
-  // Bundle
-  console.log('[render] Bundling Remotion composition...')
+  // ── 5. Bundle ─────────────────────────────────────────────────────────────
+  console.log('⏳ Bundling Remotion composition...')
   const entryPoint = path.join(__dirname, 'index.tsx')
   const bundleUrl = await bundle({
     entryPoint,
-    onProgress: (p) => process.stdout.write(`\r[bundle] ${p}%   `),
+    onProgress: (p) => process.stdout.write(`\r   Bundle: ${p}%   `),
   })
-  console.log('\n[render] Bundle ready.')
+  console.log('\n✅ Bundle ready.')
 
-  // Select composition
+  // ── 6. Select composition ─────────────────────────────────────────────────
   const composition = await selectComposition({
     serveUrl: bundleUrl,
     id: 'CancanVideo',
     inputProps,
   })
 
-  // Output path
+  // ── 7. Render ─────────────────────────────────────────────────────────────
   const outputDir = path.resolve(process.cwd(), 'output')
   mkdirSync(outputDir, { recursive: true })
   const outputPath = path.join(outputDir, `video-${scriptId}.mp4`)
 
-  // Render
-  console.log(`[render] Rendering ${durationInFrames} frames at ${fps}fps...`)
+  console.log(`⏳ Rendering ${durationInFrames} frames @ ${fps}fps...`)
   await renderMedia({
     composition: { ...composition, durationInFrames, fps },
     serveUrl: bundleUrl,
@@ -149,25 +145,25 @@ async function main() {
     outputLocation: outputPath,
     inputProps,
     onProgress: ({ progress }) => {
-      process.stdout.write(`\r[render] ${Math.round(progress * 100)}%   `)
+      process.stdout.write(`\r   Render: ${Math.round(progress * 100)}%   `)
     },
   })
-  console.log(`\n[render] Rendered → ${outputPath}`)
+  console.log(`\n✅ Rendered → ${outputPath}`)
 
   const fileSizeBytes = statSync(outputPath).size
 
-  // Upload to Supabase Storage
+  // ── 8. Upload to Supabase Storage ─────────────────────────────────────────
   const userId = videoRow?.user_id ?? script.user_id
   const storagePath = `${userId}/${scriptId}/video.mp4`
-  const fileBuffer = readFileSync(outputPath)
 
-  console.log('[render] Uploading to Supabase Storage...')
+  console.log('⏳ Uploading to Supabase Storage...')
+  const fileBuffer = readFileSync(outputPath)
   const { error: uploadErr } = await supabase.storage
     .from('videos')
     .upload(storagePath, fileBuffer, { contentType: 'video/mp4', upsert: true })
 
   if (uploadErr) {
-    console.error('Upload failed:', uploadErr.message)
+    console.error('❌ Upload failed:', uploadErr.message)
     if (videoRow) {
       await supabase
         .from('videos')
@@ -177,13 +173,13 @@ async function main() {
     process.exit(1)
   }
 
+  // ── 9. Get signed URL (1 year) ────────────────────────────────────────────
   const { data: signedUrlData } = await supabase.storage
     .from('videos')
     .createSignedUrl(storagePath, 31_536_000)
-
   const videoUrl = signedUrlData?.signedUrl ?? null
 
-  // Update videos table
+  // ── 10. Update videos row ─────────────────────────────────────────────────
   if (videoRow) {
     await supabase
       .from('videos')
@@ -194,16 +190,16 @@ async function main() {
         file_size_bytes: fileSizeBytes,
       })
       .eq('id', videoRow.id)
-    console.log(`[render] videos row ${videoRow.id} → ready`)
   }
 
-  console.log(`\n✅ Done!`)
-  console.log(`   Video URL : ${videoUrl}`)
-  console.log(`   File size : ${(fileSizeBytes / 1_048_576).toFixed(1)} MB`)
-  console.log(`   Duration  : ${Math.round(durationInSeconds)}s`)
+  console.log('\n✅ Done!')
+  console.log(`   Video URL  : ${videoUrl}`)
+  console.log(`   Duration   : ${Math.round(durationInSeconds)}s`)
+  console.log(`   File size  : ${(fileSizeBytes / 1_048_576).toFixed(1)} MB`)
+  if (videoRow) console.log(`   Video ID   : ${videoRow.id}`)
 }
 
 main().catch((err) => {
-  console.error('[render] Fatal error:', err)
+  console.error('❌ Fatal error:', err instanceof Error ? err.message : err)
   process.exit(1)
 })
